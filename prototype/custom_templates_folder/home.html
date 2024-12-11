@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velkommen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Hjem</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}">Log ud</a></li>
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Log ind</a></li>
+                    <li><a href="{{ url_for('register') }}">Registrer</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <h1>Velkommen Til Stop Nikotin</h1>
+            <p></p>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <h2>Opdag møder</h2>
+                <p>Find relevante møder om din afhængighed og tilmeld dig nemt og gratis.</p>
+            </div>
+            <div class="feature">
+                <h2>Få hjælp, støtte og rådgivning
+                </h2>
+                <p>Hos os kan du få hjælp, støtte og rådgivning af nogen som nok har oplevet det du oplever nu.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børnetelefonen</a>
+        </div>
+    </footer>
+    <div class="logo-container">
+        <div class="logo-left">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/kraeftens_bekaempelse_logo.png') }}" alt="Kræftens Bekæmpelse logo">
+            </a>
+        </div>
+        <div class="logo-right">
+            <a href="https://www.bornetelefonen.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/boernetelefonen_logo.png') }}" alt="Børnetelefonen logo">
+            </a>
+        </div>
+    </div>    
+</body>
+</html>

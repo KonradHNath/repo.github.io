@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Hjem</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Bruger Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Admin Dashboard</h1>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Opret Nyt Møde</h2>
+            </div>
+            <div class="section-content">
+                <form method="post" class="form-layout">
+                    <div class="form-group">
+                        <label for="name">Mødenavn:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Beskrivelse:</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Dato og Tid:</label>
+                        <input type="datetime-local" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="max_participants">Max. deltagere:</label>
+                        <input type="number" id="max_participants" name="max_participants" min="1" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="button-primary">Opret møde</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Alle Møder</h2>
+            </div>
+            <div class="section-content">
+                <ul class="meeting-list">
+                    {% for meeting in meetings %}
+                    <li class="meeting-item">
+                        <div class="meeting-info">
+                            <h3>{{ meeting.name }}</h3>
+                            <p>Dato: {{ meeting.date.strftime('%d-%m-%Y %H:%M') }}</p>
+                        </div>
+                        <div class="meeting-actions">
+                            <form action="{{ url_for('delete_meeting', meeting_id=meeting.id) }}" method="post">
+                                <button type="submit" class="button-danger">Slet</button>
+                            </form>
+                            <form action="{{ url_for('edit_meeting', meeting_id=meeting.id) }}" method="get">
+                                <button type="submit" class="button-secondary">Rediger</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børntelefonen</a>
+        </div>
+    </footer>
+
+    <div class="logo-container">
+        <div class="logo-left">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/kraeftens_bekaempelse_logo.png') }}" alt="Kræftens Bekæmpelse logo">
+            </a>
+        </div>
+        <div class="logo-right">
+            <a href="https://www.bornetelefonen.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/boernetelefonen_logo.png') }}" alt="Børntelefonen logo">
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .chat-info {
+            font-size: 0.85em;
+            color: #555;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">Tilbage til dashboard</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}">Log ud</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Log ind</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="chat-container">
+            <h2>Chat</h2>
+            <div id="chat"></div>
+            <div class="message-input-container">
+                <input type="text" id="message" placeholder="Skriv din besked">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Lyt efter beskeder fra serveren
+        socket.on('message', function(data) {
+            const chat = document.getElementById('chat');
+            const message = document.createElement('div');
+            message.classList.add('chat-message');
+
+            // Format beskeddata (navn, tidspunkt, alder, besked)
+            const messageContent = `
+                <div class="chat-info">
+                    <strong>${data.name}</strong> | ${data.time} | ${data.age} år
+                </div>
+                <div>${data.message}</div>
+            `;
+            
+            message.innerHTML = messageContent;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        });
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const message = messageInput.value;
+            if (message) {
+                // Hent brugernavn og alder fra server-side
+                const name = '{{ current_user.first_name }} {{ current_user.last_name }}';
+                const age = calculateAge('{{ current_user.birth_date }}');  // Forventet format: "YYYY-MM-DD"
+                const time = new Date().toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+
+                // Send data til serveren
+                socket.emit('message', { name, age, time, message });
+                messageInput.value = '';
+            }
+        }
+
+        function calculateAge(birthDate) {
+            const birthDateObj = new Date(birthDate);
+            const currentDate = new Date();
+            let age = currentDate.getFullYear() - birthDateObj.getFullYear();
+            const m = currentDate.getMonth() - birthDateObj.getMonth();
+            if (m < 0 || (m === 0 && currentDate.getDate() < birthDateObj.getDate())) {
+                age--;
+            }
+            return age;
+        }
+    </script>
+    
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børnetelefonen</a>
+        </div>
+    </footer>
+    <div class="logo-container">
+        <div class="logo-left">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/kraeftens_bekaempelse_logo.png') }}" alt="Kræftens Bekæmpelse logo">
+            </a>
+        </div>
+        <div class="logo-right">
+            <a href="https://www.bornetelefonen.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/boernetelefonen_logo.png') }}" alt="Børnetelefonen logo">
+            </a>
+        </div>
+    </div>    
+</body>
+</html>

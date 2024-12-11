@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrer dig</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Hjem</a></li>
+                <li><a href="{{ url_for('login') }}">Log ind</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Opret en ny profil</h1>
+        <form method="post">
+            <label for="first_name">Fornavn:</label>
+            <input type="text" id="first_name" name="first_name" required><br>
+
+            <label for="last_name">Efternavn:</label>
+            <input type="text" id="last_name" name="last_name" required><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
+
+            <label for="birth_date">Fødselsdato:</label>
+            <input type="date" id="birth_date" name="birth_date"><br>
+
+            <label for="password">Adgangskode:</label>
+            <input type="password" id="password" name="password" required><br>
+
+            <button type="submit">Registrer</button>
+        </form>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børnetelefonen</a>
+        </div>
+    </footer>
+    <div class="logo-container">
+        <div class="logo-left">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/kraeftens_bekaempelse_logo.png') }}" alt="Kræftens Bekæmpelse logo">
+            </a>
+        </div>
+        <div class="logo-right">
+            <a href="https://www.bornetelefonen.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/boernetelefonen_logo.png') }}" alt="Børnetelefonen logo">
+            </a>
+        </div>
+    </div>    
+</body>
+</html>

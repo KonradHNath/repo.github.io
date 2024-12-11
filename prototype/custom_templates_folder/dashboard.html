@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .dashboard-section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .meeting-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .meeting-item {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .meeting-item:last-child {
+            border-bottom: none;
+        }
+
+        .meeting-details {
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chat-section {
+            text-align: center;
+        }
+
+        .chat-link {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .chat-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function toggleDetails(meetingId) {
+            const details = document.getElementById(meetingId);
+            details.classList.toggle('hidden');
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Hjem</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}">Log ud</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Log ind</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Velkommen, {{ current_user.first_name }} {{ current_user.last_name }}</h1>
+
+        <section class="dashboard-section">
+            <h2>Mine møder</h2>
+            <ul class="meeting-list">
+                {% for meeting in user_meetings %}
+                <li class="meeting-item">
+                    <div>
+                        <strong>{{ meeting.name }}</strong> - {{ meeting.date.strftime('%d-%m-%Y') }}
+                        <span class="meeting-details" onclick="toggleDetails('details-{{ meeting.id }}')">Se detaljer</span>
+                        <div id="details-{{ meeting.id }}" class="hidden">
+                            <p>{{ meeting.description }}</p>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('unregister_from_meeting', meeting_id=meeting.id) }}" method="post">
+                        <button type="submit">Frameld</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="dashboard-section">
+            <h2>Ledige møder</h2>
+            <ul class="meeting-list">
+                {% for meeting in available_meetings %}
+                <li class="meeting-item">
+                    <div>
+                        <strong>{{ meeting.name }}</strong> - {{ meeting.date.strftime('%d-%m-%Y') }}
+                        <span class="meeting-details" onclick="toggleDetails('details-available-{{ meeting.id }}')">Se detaljer</span>
+                        <div id="details-available-{{ meeting.id }}" class="hidden">
+                            <p>{{ meeting.description }}</p>
+                        </div>
+                        <p>Tilmeldte: {{ meeting.participants | length }} / {{ meeting.max_participants }}</p>
+                    </div>
+                    <form action="{{ url_for('register_for_meeting', meeting_id=meeting.id) }}" method="post">
+                        <button type="submit" {% if meeting.participants | length >= meeting.max_participants %}disabled{% endif %}>
+                            {% if meeting.participants | length < meeting.max_participants %}
+                                Tilmeld
+                            {% else %}
+                                Fuldt
+                            {% endif %}
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {% if current_user.is_admin %}
+        <section class="dashboard-section">
+            <h2>Admin Funktioner</h2>
+            <a href="{{ url_for('admin_dashboard') }}" class="chat-link">Gå til Admin Dashboard</a>
+        </section>
+        {% endif %}
+
+        <section class="chat-section">
+            <h2>Chat</h2>
+            <a href="{{ url_for('chat') }}" class="chat-link">Gå til chat</a>
+            <a href="{{ url_for('anonymous_chat') }}" class="chat-link">Gå til anonym chat</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børnetelefonen</a>
+        </div>
+    </footer>
+</body>
+</html>

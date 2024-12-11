@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonym Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        /* Yderligere styling for anonym chat */
+        .anonymous-chat-container {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            padding: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #f4f4f4;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        #anonymous-chat {
+            border: 1px solid #ddd;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+
+        .anonymous-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+
+        .anonymous-info {
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .anonymous-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #anonymous-message {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .anonymous-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #6c757d;
+            color: white;
+            cursor: pointer;
+        }
+
+        .anonymous-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}">Tilbage til dashboard</a></li>
+                <li><a href="{{ url_for('logout') }}">Log ud</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="anonymous-chat-container">
+            <h2>Anonym Chat</h2>
+            <div id="anonymous-chat"></div>
+            <div class="anonymous-input-container">
+                <input type="text" id="anonymous-message" placeholder="Skriv en besked...">
+                <button class="anonymous-button" onclick="sendAnonymousMessage()">Send</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank" class="footer-link">Kræftens Bekæmpelse</a>
+            <a href="https://www.bornetelefonen.dk" target="_blank" class="footer-link">Børnetelefonen</a>
+        </div>
+    </footer>
+    <div class="logo-container">
+        <div class="logo-left">
+            <a href="https://www.kraeftensbekaempelse.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/kraeftens_bekaempelse_logo.png') }}" alt="Kræftens Bekæmpelse logo">
+            </a>
+        </div>
+        <div class="logo-right">
+            <a href="https://www.bornetelefonen.dk" target="_blank">
+                <img src="{{ url_for('static', filename='images/boernetelefonen_logo.png') }}" alt="Børnetelefonen logo">
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/anonymous');
+
+        socket.on('anonymous_message', function(data) {
+            const chat = document.getElementById('anonymous-chat');
+            const message = document.createElement('div');
+            message.classList.add('anonymous-message');
+            
+            // Formatér data
+            const messageContent = `
+                <div class="anonymous-info">Anonym | ${data.time}</div>
+                <div>${data.message}</div>
+            `;
+            message.innerHTML = messageContent;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        });
+
+        function sendAnonymousMessage() {
+            const messageInput = document.getElementById('anonymous-message');
+            const message = messageInput.value;
+            if (message) {
+                const time = new Date().toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                socket.emit('anonymous_message', { message, time });
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
